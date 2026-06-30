@@ -176,6 +176,30 @@ export default async function ScanDetailPage({ params }: ScanDetailPageProps) {
                             </div>
                         </CardHeader>
 
+                        <Card className="rounded-2xl border-dashed">
+                            <CardHeader>
+                                <CardTitle>Scanner capability</CardTitle>
+                                <CardDescription>
+                                    This scan uses a static HTML accessibility checker. It detects common
+                                    issues such as missing alt text, missing labels, empty buttons or links,
+                                    missing page titles, missing language attributes, skipped headings, and
+                                    missing main landmarks.
+                                </CardDescription>
+                            </CardHeader>
+                        </Card>
+
+                        <Card className="rounded-2xl border-dashed">
+                            <CardHeader>
+                                <CardTitle>Scanner limitations</CardTitle>
+                                <CardDescription>
+                                    This version scans the initial HTML returned by the website. It does not
+                                    fully evaluate JavaScript-rendered content, keyboard interaction flows,
+                                    focus traps, dynamic modals, or visual color contrast from computed CSS.
+                                    Browser-based scanning with Playwright can be added in a later phase.
+                                </CardDescription>
+                            </CardHeader>
+                        </Card>
+
                         <CardContent>
                             <p className="text-5xl font-semibold">{scanData.score}</p>
                             <p className="mt-1 text-sm text-muted-foreground">out of 100</p>

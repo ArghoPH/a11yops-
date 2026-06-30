@@ -84,7 +84,7 @@ export default function NewScanPage() {
             return;
         }
 
-        router.push("/dashboard/scans");
+        router.push(`/dashboard/scans/${result.scanId}`);
         router.refresh();
     }
 
@@ -103,8 +103,7 @@ export default function NewScanPage() {
                         Run New Scan
                     </h1>
                     <p className="text-sm text-muted-foreground">
-                        Select a project and run a demo accessibility scan through the API
-                        route.
+                        Select a project and run a real static HTML accessibility scan through the API route.
                     </p>
                 </div>
 
@@ -118,9 +117,9 @@ export default function NewScanPage() {
                             <div>
                                 <CardTitle>Scan details</CardTitle>
                                 <CardDescription>
-                                    This demo flow calls <span className="font-mono">/api/scans</span>,
-                                    creates a scan, and inserts accessibility issues into Supabase.
-                                    The automated scanner engine will be added in the next phase.
+                                    This flow calls <span className="font-mono">/api/scans</span>,
+                                    fetches the project website URL, scans the returned HTML, creates a scan,
+                                    and saves detected accessibility issues in Supabase.
                                 </CardDescription>
                             </div>
                         </div>
@@ -172,7 +171,7 @@ export default function NewScanPage() {
                                 ) : (
                                     <>
                                         <Play className="mr-2 size-4" />
-                                        Run Demo Scan
+                                        Run Accessibility Scan
                                     </>
                                 )}
                             </Button>
