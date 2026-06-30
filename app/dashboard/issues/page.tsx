@@ -136,7 +136,13 @@ export default async function IssuesPage() {
                                 {(issues as Issue[] | null)?.map((issue) => (
                                     <TableRow key={issue.id}>
                                         <TableCell className="max-w-[360px]">
-                                            <div className="font-medium">{issue.title}</div>
+                                            <Link
+                                                href={`/dashboard/issues/${issue.id}`}
+                                                className="font-medium hover:underline"
+                                            >
+                                                {issue.title}
+                                            </Link>
+
                                             <div className="mt-1 text-sm text-muted-foreground">
                                                 {issue.suggested_fix ?? issue.description}
                                             </div>

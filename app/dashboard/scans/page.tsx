@@ -79,9 +79,11 @@ export default async function ScansPage() {
                         </p>
                     </div>
 
-                    <Button>
-                        <Plus className="mr-2 size-4" />
-                        New Scan
+                    <Button asChild>
+                        <Link href="/dashboard/scans/new">
+                            <Plus className="mr-2 size-4" />
+                            New Scan
+                        </Link>
                     </Button>
                 </div>
 
