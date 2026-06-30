@@ -132,22 +132,24 @@ export default async function DashboardPage() {
 
                     <nav className="space-y-1 p-4">
                         {[
-                            { label: "Overview", icon: LayoutDashboard },
-                            { label: "Projects", icon: Globe },
-                            { label: "Scans", icon: Activity },
-                            { label: "Reports", icon: FileText },
-                            { label: "Settings", icon: Settings },
+                            { label: "Overview", icon: LayoutDashboard, href: "/dashboard" },
+                            { label: "Projects", icon: Globe, href: "/dashboard/projects" },
+                            { label: "Scans", icon: Activity, href: "/dashboard/scans" },
+                            { label: "Issues", icon: AlertTriangle, href: "/dashboard/issues" },
+                            { label: "Reports", icon: FileText, href: "/dashboard/reports" },
+                            { label: "Settings", icon: Settings, href: "/dashboard/settings" },
                         ].map((item) => {
                             const Icon = item.icon;
 
                             return (
-                                <button
+                                <Link
                                     key={item.label}
+                                    href={item.href}
                                     className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
                                 >
                                     <Icon className="size-4" />
                                     {item.label}
-                                </button>
+                                </Link>
                             );
                         })}
                     </nav>
