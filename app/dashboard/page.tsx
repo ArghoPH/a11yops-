@@ -164,9 +164,11 @@ export default async function DashboardPage() {
                             </p>
                         </div>
 
-                        <Button>
-                            <Plus className="mr-2 size-4" />
-                            New Scan
+                        <Button asChild>
+                            <Link href="/dashboard/scans/new">
+                                <Plus className="mr-2 size-4" />
+                                New Scan
+                            </Link>
                         </Button>
                     </header>
 
@@ -194,12 +196,51 @@ export default async function DashboardPage() {
                             })}
                         </div>
 
+                        <Card className="rounded-2xl">
+                            <CardHeader>
+                                <CardTitle>Quick actions</CardTitle>
+                                <CardDescription>
+                                    Jump into the main audit workflows from one place.
+                                </CardDescription>
+                            </CardHeader>
+
+                            <CardContent className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                                <Button variant="outline" asChild className="justify-start">
+                                    <Link href="/dashboard/projects">
+                                        <Globe className="mr-2 size-4" />
+                                        View Projects
+                                    </Link>
+                                </Button>
+
+                                <Button variant="outline" asChild className="justify-start">
+                                    <Link href="/dashboard/scans/new">
+                                        <Plus className="mr-2 size-4" />
+                                        Run New Scan
+                                    </Link>
+                                </Button>
+
+                                <Button variant="outline" asChild className="justify-start">
+                                    <Link href="/dashboard/issues">
+                                        <AlertTriangle className="mr-2 size-4" />
+                                        Review Issues
+                                    </Link>
+                                </Button>
+
+                                <Button variant="outline" asChild className="justify-start">
+                                    <Link href="/dashboard/reports">
+                                        <FileText className="mr-2 size-4" />
+                                        View Reports
+                                    </Link>
+                                </Button>
+                            </CardContent>
+                        </Card>
+
                         <div className="grid gap-6 xl:grid-cols-[1fr_360px]">
                             <Card className="rounded-2xl">
                                 <CardHeader>
                                     <CardTitle>Latest issues</CardTitle>
                                     <CardDescription>
-                                        Data is coming from Supabase now. Tiny miracle.
+                                        Most recent accessibility issues loaded from Supabase.
                                     </CardDescription>
                                 </CardHeader>
 

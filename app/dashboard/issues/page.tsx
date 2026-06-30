@@ -112,8 +112,7 @@ export default async function IssuesPage() {
                             <div>
                                 <CardTitle>Accessibility issues</CardTitle>
                                 <CardDescription>
-                                    WCAG issue data is loaded from Supabase. The table has escaped
-                                    its mock-data prison.
+                                    WCAG issue data is loaded from Supabase for review and tracking.
                                 </CardDescription>
                             </div>
                         </div>

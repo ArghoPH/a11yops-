@@ -97,8 +97,7 @@ export default async function ScansPage() {
                             <div>
                                 <CardTitle>Scan history</CardTitle>
                                 <CardDescription>
-                                    Scan data is loaded from Supabase. Finally, a table doing
-                                    actual work instead of pretending.
+                                    Scan history is loaded from Supabase with project and score data.
                                 </CardDescription>
                             </div>
                         </div>
@@ -120,7 +119,12 @@ export default async function ScansPage() {
                                 {(scans as Scan[] | null)?.map((scan) => (
                                     <TableRow key={scan.id}>
                                         <TableCell className="font-medium">
-                                            {scan.projects?.name ?? "Unknown project"}
+                                            <Link
+                                                href={`/dashboard/scans/${scan.id}`}
+                                                className="hover:underline"
+                                            >
+                                                {scan.projects?.name ?? "Unknown project"}
+                                            </Link>
                                         </TableCell>
 
                                         <TableCell>

@@ -118,10 +118,9 @@ export default function NewScanPage() {
                             <div>
                                 <CardTitle>Scan details</CardTitle>
                                 <CardDescription>
-                                    This now calls <span className="font-mono">/api/scans</span>,
-                                    creates a scan, and inserts demo accessibility issues into
-                                    Supabase. Actual scanner আসবে পরে, কারণ software-এ fake
-                                    confidence already যথেষ্ট মহামারী।
+                                    This demo flow calls <span className="font-mono">/api/scans</span>,
+                                    creates a scan, and inserts accessibility issues into Supabase.
+                                    The automated scanner engine will be added in the next phase.
                                 </CardDescription>
                             </div>
                         </div>
