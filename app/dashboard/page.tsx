@@ -2,7 +2,6 @@ import Link from "next/link";
 import {
     Activity,
     AlertTriangle,
-    ArrowUpRight,
     CheckCircle2,
     FileText,
     Globe,
@@ -10,6 +9,8 @@ import {
     Plus,
     Settings,
 } from "lucide-react";
+
+import { supabase } from "@/lib/supabase/client";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -29,61 +30,93 @@ import {
     TableRow,
 } from "@/components/ui/table";
 
-const overviewCards = [
-    {
-        title: "Projects",
-        value: "04",
-        description: "Active website audits",
-        icon: Globe,
-    },
-    {
-        title: "Critical Issues",
-        value: "18",
-        description: "Need urgent attention",
-        icon: AlertTriangle,
-    },
-    {
-        title: "Fixed Issues",
-        value: "57",
-        description: "Resolved this month",
-        icon: CheckCircle2,
-    },
-    {
-        title: "Reports",
-        value: "09",
-        description: "Generated for clients",
-        icon: FileText,
-    },
-];
+type Issue = {
+    id: string;
+    title: string;
+    page_url: string | null;
+    severity: "critical" | "serious" | "moderate" | "minor";
+    status: "open" | "in_progress" | "fixed" | "ignored";
+};
 
-const issues = [
-    {
-        title: "Button has no accessible name",
-        page: "/pricing",
-        severity: "Critical",
-        status: "Open",
-    },
-    {
-        title: "Image missing alt text",
-        page: "/services",
-        severity: "Serious",
-        status: "In Progress",
-    },
-    {
-        title: "Input field missing label",
-        page: "/contact",
-        severity: "Critical",
-        status: "Open",
-    },
-    {
-        title: "Low color contrast on CTA",
-        page: "/",
-        severity: "Moderate",
-        status: "Fixed",
-    },
-];
+function formatSeverity(severity: Issue["severity"]) {
+    return {
+        critical: "Critical",
+        serious: "Serious",
+        moderate: "Moderate",
+        minor: "Minor",
+    }[severity];
+}
 
-export default function DashboardPage() {
+function formatStatus(status: Issue["status"]) {
+    return {
+        open: "Open",
+        in_progress: "In Progress",
+        fixed: "Fixed",
+        ignored: "Ignored",
+    }[status];
+}
+
+function getSeverityVariant(severity: Issue["severity"]) {
+    if (severity === "critical") return "destructive";
+    return "secondary";
+}
+
+export default async function DashboardPage() {
+    const { count: projectCount } = await supabase
+        .from("projects")
+        .select("*", { count: "exact", head: true });
+
+    const { count: criticalCount } = await supabase
+        .from("issues")
+        .select("*", { count: "exact", head: true })
+        .eq("severity", "critical");
+
+    const { count: fixedCount } = await supabase
+        .from("issues")
+        .select("*", { count: "exact", head: true })
+        .eq("status", "fixed");
+
+    const { data: latestScan } = await supabase
+        .from("scans")
+        .select("score")
+        .order("created_at", { ascending: false })
+        .limit(1);
+
+    const { data: issues } = await supabase
+        .from("issues")
+        .select("id, title, page_url, severity, status")
+        .order("created_at", { ascending: false })
+        .limit(8);
+
+    const score = latestScan?.[0]?.score ?? 0;
+
+    const overviewCards = [
+        {
+            title: "Projects",
+            value: String(projectCount ?? 0).padStart(2, "0"),
+            description: "Active website audits",
+            icon: Globe,
+        },
+        {
+            title: "Critical Issues",
+            value: String(criticalCount ?? 0).padStart(2, "0"),
+            description: "Need urgent attention",
+            icon: AlertTriangle,
+        },
+        {
+            title: "Fixed Issues",
+            value: String(fixedCount ?? 0).padStart(2, "0"),
+            description: "Resolved issues",
+            icon: CheckCircle2,
+        },
+        {
+            title: "Reports",
+            value: "00",
+            description: "Generated for clients",
+            icon: FileText,
+        },
+    ];
+
     return (
         <main className="min-h-screen bg-muted/30">
             <div className="grid min-h-screen lg:grid-cols-[260px_1fr]">
@@ -161,18 +194,11 @@ export default function DashboardPage() {
 
                         <div className="grid gap-6 xl:grid-cols-[1fr_360px]">
                             <Card className="rounded-2xl">
-                                <CardHeader className="flex flex-row items-center justify-between">
-                                    <div>
-                                        <CardTitle>Latest issues</CardTitle>
-                                        <CardDescription>
-                                            Most recent accessibility problems found in scans.
-                                        </CardDescription>
-                                    </div>
-
-                                    <Button variant="outline" size="sm">
-                                        View all
-                                        <ArrowUpRight className="ml-2 size-4" />
-                                    </Button>
+                                <CardHeader>
+                                    <CardTitle>Latest issues</CardTitle>
+                                    <CardDescription>
+                                        Data is coming from Supabase now. Tiny miracle.
+                                    </CardDescription>
                                 </CardHeader>
 
                                 <CardContent>
@@ -185,25 +211,20 @@ export default function DashboardPage() {
                                                 <TableHead>Status</TableHead>
                                             </TableRow>
                                         </TableHeader>
+
                                         <TableBody>
-                                            {issues.map((issue) => (
-                                                <TableRow key={issue.title}>
+                                            {(issues as Issue[] | null)?.map((issue) => (
+                                                <TableRow key={issue.id}>
                                                     <TableCell className="font-medium">
                                                         {issue.title}
                                                     </TableCell>
-                                                    <TableCell>{issue.page}</TableCell>
+                                                    <TableCell>{issue.page_url ?? "-"}</TableCell>
                                                     <TableCell>
-                                                        <Badge
-                                                            variant={
-                                                                issue.severity === "Critical"
-                                                                    ? "destructive"
-                                                                    : "secondary"
-                                                            }
-                                                        >
-                                                            {issue.severity}
+                                                        <Badge variant={getSeverityVariant(issue.severity)}>
+                                                            {formatSeverity(issue.severity)}
                                                         </Badge>
                                                     </TableCell>
-                                                    <TableCell>{issue.status}</TableCell>
+                                                    <TableCell>{formatStatus(issue.status)}</TableCell>
                                                 </TableRow>
                                             ))}
                                         </TableBody>
@@ -215,41 +236,41 @@ export default function DashboardPage() {
                                 <CardHeader>
                                     <CardTitle>Current audit score</CardTitle>
                                     <CardDescription>
-                                        Overall score for the latest website scan.
+                                        Latest scan score from Supabase.
                                     </CardDescription>
                                 </CardHeader>
 
                                 <CardContent>
                                     <div className="flex items-end justify-between">
                                         <div>
-                                            <p className="text-5xl font-semibold">74</p>
+                                            <p className="text-5xl font-semibold">{score}</p>
                                             <p className="mt-1 text-sm text-muted-foreground">
                                                 out of 100
                                             </p>
                                         </div>
-                                        <Badge>Needs work</Badge>
+
+                                        <Badge>{score >= 90 ? "Good" : "Needs work"}</Badge>
                                     </div>
 
                                     <div className="mt-6 h-3 rounded-full bg-muted">
-                                        <div className="h-3 w-[74%] rounded-full bg-primary" />
+                                        <div
+                                            className="h-3 rounded-full bg-primary"
+                                            style={{ width: `${score}%` }}
+                                        />
                                     </div>
 
                                     <div className="mt-6 space-y-3 text-sm">
                                         <div className="flex justify-between">
                                             <span className="text-muted-foreground">Critical</span>
-                                            <span>18</span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <span className="text-muted-foreground">Serious</span>
-                                            <span>24</span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <span className="text-muted-foreground">Moderate</span>
-                                            <span>31</span>
+                                            <span>{criticalCount ?? 0}</span>
                                         </div>
                                         <div className="flex justify-between">
                                             <span className="text-muted-foreground">Fixed</span>
-                                            <span>57</span>
+                                            <span>{fixedCount ?? 0}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-muted-foreground">Projects</span>
+                                            <span>{projectCount ?? 0}</span>
                                         </div>
                                     </div>
                                 </CardContent>
