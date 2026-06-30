@@ -15,7 +15,6 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 type Project = {
@@ -29,7 +28,6 @@ export default function NewScanPage() {
 
     const [projects, setProjects] = useState<Project[]>([]);
     const [projectId, setProjectId] = useState("");
-    const [score, setScore] = useState("74");
     const [error, setError] = useState("");
     const [isLoadingProjects, setIsLoadingProjects] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -65,25 +63,24 @@ export default function NewScanPage() {
             return;
         }
 
-        const numericScore = Number(score);
-
-        if (Number.isNaN(numericScore) || numericScore < 0 || numericScore > 100) {
-            setError("Score must be a number between 0 and 100.");
-            return;
-        }
-
         setIsSubmitting(true);
 
-        const { error: insertError } = await supabase.from("scans").insert({
-            project_id: projectId,
-            score: numericScore,
-            status: "completed",
+        const response = await fetch("/api/scans", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                projectId,
+            }),
         });
+
+        const result = await response.json();
 
         setIsSubmitting(false);
 
-        if (insertError) {
-            setError(insertError.message);
+        if (!response.ok) {
+            setError(result.error ?? "Failed to run scan.");
             return;
         }
 
@@ -103,10 +100,11 @@ export default function NewScanPage() {
                     </Button>
 
                     <h1 className="text-2xl font-semibold tracking-tight">
-                        Create New Scan
+                        Run New Scan
                     </h1>
                     <p className="text-sm text-muted-foreground">
-                        Create a demo accessibility scan for a project.
+                        Select a project and run a demo accessibility scan through the API
+                        route.
                     </p>
                 </div>
 
@@ -120,9 +118,10 @@ export default function NewScanPage() {
                             <div>
                                 <CardTitle>Scan details</CardTitle>
                                 <CardDescription>
-                                    This MVP version saves a demo scan to Supabase. The real
-                                    scanner API comes later, because apparently we enjoy earning
-                                    features instead of hallucinating them.
+                                    This now calls <span className="font-mono">/api/scans</span>,
+                                    creates a scan, and inserts demo accessibility issues into
+                                    Supabase. Actual scanner আসবে পরে, কারণ software-এ fake
+                                    confidence already যথেষ্ট মহামারী।
                                 </CardDescription>
                             </div>
                         </div>
@@ -154,18 +153,6 @@ export default function NewScanPage() {
                                 </select>
                             </div>
 
-                            <div className="space-y-2">
-                                <Label htmlFor="score">Accessibility score</Label>
-                                <Input
-                                    id="score"
-                                    type="number"
-                                    min="0"
-                                    max="100"
-                                    value={score}
-                                    onChange={(event) => setScore(event.target.value)}
-                                />
-                            </div>
-
                             {error ? (
                                 <div className="rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
                                     {error}
@@ -174,12 +161,14 @@ export default function NewScanPage() {
 
                             <Button
                                 type="submit"
-                                disabled={isSubmitting || isLoadingProjects || projects.length === 0}
+                                disabled={
+                                    isSubmitting || isLoadingProjects || projects.length === 0
+                                }
                             >
                                 {isSubmitting ? (
                                     <>
                                         <Loader2 className="mr-2 size-4 animate-spin" />
-                                        Creating scan...
+                                        Running scan...
                                     </>
                                 ) : (
                                     <>
